@@ -26,43 +26,70 @@ class FormularioTransferencia extends StatelessWidget {
         ),
         body: Column(
           children: [
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: TextField(
-                controller: _controladorCampoNumeroConta,
-                style: TextStyle(fontSize: 24.0),
-                decoration: InputDecoration(
-                    labelText: 'Número da conta', hintText: '0000'),
-                keyboardType: TextInputType.number,
-              ),
+            Editor(
+              controlador: _controladorCampoNumeroConta,
+              dica: '000',
+              rotulo: 'Numero da Conta',
             ),
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: TextField(
-                controller: _controladorCampoValor,
-                style: TextStyle(fontSize: 24.0),
-                decoration: InputDecoration(
-                    icon: Icon(Icons.monetization_on),
-                    labelText: 'Valor',
-                    hintText: '0.00'),
-                keyboardType: TextInputType.number,
-              ),
+            Editor(
+              controlador: _controladorCampoValor,
+              dica: '0.00',
+              rotulo: 'valor',
+              icone: Icons.monetization_on,
             ),
             ElevatedButton(
-                onPressed: () {
-                  final int? numeroConta =
-                      int.tryParse(_controladorCampoNumeroConta.text);
-                  final double? valor =
-                      double.tryParse(_controladorCampoValor.text);
-                  if (numeroConta != null && valor != null) {
-                    final transferenciaCriada =
-                        Transferencia(valor, numeroConta);
-                    debugPrint('$transferenciaCriada');
-                  }
-                },
-                child: Text('Confirmar'))
+              child: Text('Confirmar'),
+              onPressed: () => _criaTransferencia(),
+            )
           ],
         ));
+  }
+
+  _criaTransferencia() {
+    final int? numeroConta = int.tryParse(_controladorCampoNumeroConta.text);
+    final double? valor = double.tryParse(_controladorCampoValor.text);
+    if (numeroConta != null && valor != null) {
+      final transferenciaCriada = Transferencia(valor, numeroConta);
+      debugPrint('$transferenciaCriada');
+    }
+  }
+}
+/*
+*Não sei oq deu mas pra cirar metodo sem VOID e sim _nomedometodo
+ */
+
+
+
+class Editor extends StatelessWidget {
+  const Editor({
+    required this.controlador,
+    required this.rotulo,
+    required this.dica,
+    this.icone,
+  });
+
+  final TextEditingController controlador;
+  final String rotulo;
+  final String dica;
+  final IconData? icone;
+  //* Quando não se porde ser NULL tem q por a interrogação
+  /*
+       * *icon: icone != null ? Icon(icone) : null */
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: TextField(
+        controller: controlador,
+        style: TextStyle(fontSize: 24.0),
+        decoration: InputDecoration(
+            icon: icone != null ? Icon(icone) : null,
+            labelText: rotulo,
+            hintText: dica),
+        keyboardType: TextInputType.number,
+      ),
+    );
   }
 }
 
