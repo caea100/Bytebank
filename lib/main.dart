@@ -1,3 +1,6 @@
+import 'dart:html';
+import 'dart:js';
+
 import 'package:flutter/material.dart';
 
 void main() => runApp(Bytebank());
@@ -7,7 +10,7 @@ class Bytebank extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       home: Scaffold(
-        body: FormularioTransferencia(),
+        body: ListaTrasferencias(),
       ),
     );
   }
@@ -39,26 +42,25 @@ class FormularioTransferencia extends StatelessWidget {
             ),
             ElevatedButton(
               child: Text('Confirmar'),
-              onPressed: () => _criaTransferencia(),
+              onPressed: () => _criaTransferencia(context),
             )
           ],
         ));
   }
 
-  _criaTransferencia() {
+  _criaTransferencia(BuildContext context) {
     final int? numeroConta = int.tryParse(_controladorCampoNumeroConta.text);
     final double? valor = double.tryParse(_controladorCampoValor.text);
     if (numeroConta != null && valor != null) {
       final transferenciaCriada = Transferencia(valor, numeroConta);
       debugPrint('$transferenciaCriada');
+      Navigator.pop(context, transferenciaCriada);
     }
   }
 }
 /*
 *Não sei oq deu mas pra cirar metodo sem VOID e sim _nomedometodo
  */
-
-
 
 class Editor extends StatelessWidget {
   const Editor({
@@ -94,21 +96,35 @@ class Editor extends StatelessWidget {
 }
 
 class ListaTrasferencias extends StatelessWidget {
+
+final List<Transferencia> _trasnferencias = [];//* Cria uma lista zerada
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text('Transferências'),
       ),
-      body: Column(
+      body: ListView(
         children: [
-          ItemTransferencia(Transferencia(100.0, 10000)),
-          ItemTransferencia(Transferencia(200.0, 1000)),
-          ItemTransferencia(Transferencia(300.0, 500)),
+Body : ListView.builder(itemBuilder: _trasnferencias.length , itemBuilder:(context, indice){
+  final transferencia = _trasnferencias[indice];
+  return ItemTransferencia(transferencia);
+} ,)
         ],
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {},
+        onPressed: () {
+          final Future<Transferencia?> future =
+              Navigator.push(context, MaterialPageRoute(builder: (context) {
+            return FormularioTransferencia();
+          }));
+          future.then((transferenciaRecebida) {
+            debugPrint('chegou no then do future');
+            debugPrint('$transferenciaRecebida');
+            _trasnferencias.add(transferenciaRecebida);
+          });
+        },
         child: Icon(Icons.add),
       ),
     );
